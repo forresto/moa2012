@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>aalto MoA 2012 animation</title>
+  <meta name="author" content="forresto">
+  <meta name="description" content="canvas animation for Aalto Master of Arts show" />
+  
+  <script type="text/javascript" src="ThreeCanvas.js"></script>
+  <script type="text/javascript" src="tween.js"></script>
+  
+  <style type="text/css">
+    body {
+      background-color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    canvas {
+      background-color: black;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="moabar_animation" style="display: inline-block; width: 700px; height:220px">
+  </div>
+
+  <br/>
+  <br/>
+  <button onclick="MOA2012ANIMATION.gotoAngle(0, 0, 0)">front</button>
+  <button onclick="MOA2012ANIMATION.gotoAngle(0, -1.5708, 0)">right</button>
+  <button onclick="MOA2012ANIMATION.gotoAngle(1.5708, 0, 0)">top</button>
+  
+  <script type="text/javascript" src="moa2012animation.js"></script>
+  <script type="text/javascript">
+    MOA2012ANIMATION("moabar_animation");
+    MOA2012ANIMATION.gotoAngle(1.5708, 0, 0);
+  </script>
+  
+</body>
+</html>
