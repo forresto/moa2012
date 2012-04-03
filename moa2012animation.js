@@ -192,13 +192,13 @@ MOA2012ANIMATION.cameraLoop = function() {
 
   tweenTop = new TWEEN.Tween(tweenRotation)
     .to(top, 2000)
-    .delay(2000)
+    .delay(4000)
     .easing(TWEEN.Easing.Quadratic.EaseInOut)
     .start();
 
   var tweenRight = new TWEEN.Tween(tweenRotation)
     .to(right, 2000)
-    .delay(2000)
+    .delay(4000)
     .easing(TWEEN.Easing.Quadratic.EaseInOut);
 
   // loop
