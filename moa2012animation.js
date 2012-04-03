@@ -1,11 +1,11 @@
-var MOA2012ANIMATION = function(divId){
+var MOA2012ANIMATION = function(divId, _w, _h){
 
 var container;
 var camera, scene, renderer, group, particle;
 var mouseX = 0, mouseY = 0;
 
-var WIDTH = 700;
-var HEIGHT = 220;
+var WIDTH = _w;
+var HEIGHT = _h;
 
 var windowHalfX = WIDTH / 2;
 var windowHalfY = HEIGHT / 2;
