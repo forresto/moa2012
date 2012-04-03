@@ -173,20 +173,37 @@ function render() {
 
 
 MOA2012ANIMATION.gotoAngle = function(x, y, z) {
+  gotoAngle = true;
+
   tweenRotation = { x: group.rotation.x, y: group.rotation.y, z: group.rotation.z };
   var target = { x: x, y: y, z: z };
   tween = new TWEEN.Tween(tweenRotation).to(target, 2000)
     .easing(TWEEN.Easing.Quadratic.EaseInOut)
     .start();
+}
+
+MOA2012ANIMATION.cameraLoop = function() {
   gotoAngle = true;
 
-  // tween.onUpdate(function(){
-  //   console.log(tweenRotation.x);
-  // }); 
+  tweenRotation = { x: group.rotation.x, y: group.rotation.y, z: group.rotation.z };
 
-  // tween.onComplete(function(){
-  //   gotoAngle = false;
-  // });
+  var top = { x: 1.5708, y: 0, z: 0 }
+  var right = { x: 0, y: -1.5708, z: 0 };
+
+  tweenTop = new TWEEN.Tween(tweenRotation)
+    .to(top, 2000)
+    .delay(2000)
+    .easing(TWEEN.Easing.Quadratic.EaseInOut)
+    .start();
+
+  var tweenRight = new TWEEN.Tween(tweenRotation)
+    .to(right, 2000)
+    .delay(2000)
+    .easing(TWEEN.Easing.Quadratic.EaseInOut);
+
+  // loop
+  tweenTop.chain(tweenRight);
+  tweenRight.chain(tweenTop); 
 }
 
 // Start
