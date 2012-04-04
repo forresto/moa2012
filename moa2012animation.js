@@ -190,8 +190,8 @@ var cameraLoop = function() {
 
   tweenRotation = { x: group.rotation.x, y: group.rotation.y, z: group.rotation.z, opacity1: 0, opacity2: 0 };
 
-  var top = { x: 1.5708, y: 0, z: 0, opacity1: 1, opacity2: 0 }
-  var right = { x: 0, y: -1.5708, z: 0, opacity1: 0, opacity2: 1 };
+  var top = { x: 1.5708, y: 0, z: 0, opacity1: 0.8, opacity2: 0 }
+  var right = { x: 0, y: -1.5708, z: 0, opacity1: 0, opacity2: 0.8 };
 
   var firstTop = new TWEEN.Tween(tweenRotation)
     .to(top, 2000)
