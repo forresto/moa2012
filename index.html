@@ -25,18 +25,22 @@
   <div id="moabar_animation" style="display: inline-block; width: 700px; height:220px">
   </div>
 
-  <br/>
-  <br/>
   <!-- 
-  <button onclick="MOA2012ANIMATION.gotoAngle(0, 0, 0)">front</button>
-  <button onclick="MOA2012ANIMATION.gotoAngle(0, -1.5708, 0)">right</button>
-  <button onclick="MOA2012ANIMATION.gotoAngle(1.5708, 0, 0)">top</button>
-  -->  
+  <br/>
+  <br/>
+
+  <div id="moa_box_animation" style="display: inline-block; width: 220px; height:220px">
+  </div>
+  -->
   <script type="text/javascript" src="moa2012animation.js"></script>
   <script type="text/javascript">
-    MOA2012ANIMATION("moabar_animation", 700, 220);
-    // MOA2012ANIMATION.gotoAngle(1.5708, 0, 0);
-    MOA2012ANIMATION.cameraLoop();
+    // div id, width, height, grid divisions
+    var horizontalAnimation = MOA2012ANIMATION("moabar_animation", 700, 220, 40);
+    horizontalAnimation.setTexts(["the future now open for","fedcba abcdef fedcba"]);
+
+    // var boxAnimation = MOA2012ANIMATION("moabar_animation", 220, 220, 20);
+    // boxAnimation.setTexts(["abcdef fedcba","fedcba abc"]);
+
   </script>
   
 </body>

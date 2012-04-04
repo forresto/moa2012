@@ -1,7 +1,7 @@
-var MOA2012ANIMATION = function(divId, _w, _h){
+var MOA2012ANIMATION = function(divId, _w, _h, _count){
 
 var container;
-var camera, scene, renderer, group, particle;
+var camera, scene, renderer, group, groupX, groupY, groupZ, particle;
 var mouseX = 0, mouseY = 0;
 
 var WIDTH = _w;
@@ -17,9 +17,8 @@ var THIRDWINDOW = Math.floor();
 // set up the grid
 var size = WIDTH*1.2;
 var halfsize = size/2;
-var count = 30;
+var count = _count;
 var spacing = Math.floor(size/count);
-
 
 this.init = function() {
 
@@ -29,7 +28,8 @@ this.init = function() {
 
   // camera = new THREE.PerspectiveCamera( 75, WIDTH / HEIGHT, 1, 3000 );
   // camera.position.z = 1000;
-  camera = new THREE.OrthographicCamera(-WIDTH/2, WIDTH/2, HEIGHT/2, -HEIGHT/2, -3000, 3000);
+  var ORTHOZOOM = 2;
+  camera = new THREE.OrthographicCamera(-WIDTH/ORTHOZOOM, WIDTH/ORTHOZOOM, HEIGHT/ORTHOZOOM, -HEIGHT/ORTHOZOOM, -3000, 3000);
   camera.position.z = 1000;
 
   scene = new THREE.Scene();
@@ -40,52 +40,39 @@ this.init = function() {
 
   group = new THREE.Object3D();
   MOA2012ANIMATION.group = group;
-  groupX = new THREE.Object3D();
-  group.add( groupX );
-  groupY = new THREE.Object3D();
-  group.add( groupY );
-  groupZ = new THREE.Object3D();
-  group.add( groupZ );
+  // groupX = new THREE.Object3D();
+  // group.add( groupX );
+  // groupY = new THREE.Object3D();
+  // group.add( groupY );
+  // groupZ = new THREE.Object3D();
+  // group.add( groupZ );
+  groupGrid = new THREE.Object3D();
+  group.add( groupGrid );
+
+
 
   scene.add( group );
 
-  var lettermaterial = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 1, linewidth: 3, linecap: "butt" } );
-  var gridmaterial = new THREE.LineBasicMaterial( { color: 0xAAAAAA, opacity: 1, linewidth: .5, linecap: "square" } );
+  var particleprogram = function (context){
+    context.beginPath();
+    context.arc( 0, 0, 1, 0, PI2, true );
+    context.closePath();
+    context.fill();
+  };
+  var particlematerial = new THREE.ParticleCanvasMaterial( { color: 0x666666, program: particleprogram } );
+
+  var borderwidth = 3;
 
   for (var x=0; x<count; x++) {
     for (var y=0; y<count; y++) {
       for (var z=0; z<count; z++) {
-        if (Math.random()>.97) {
-
-          var geometry = new THREE.Geometry();
-          
-          var rand = Math.random();
-          if (rand<.333) {
-            // X
-            var vector = new THREE.Vector3( x*spacing - halfsize, y*spacing - halfsize, z*spacing - halfsize );
-            geometry.vertices.push( new THREE.Vertex( vector ) );
-            var vector2 = new THREE.Vector3( x*spacing - halfsize + spacing, y*spacing - halfsize, z*spacing - halfsize );
-            geometry.vertices.push( new THREE.Vertex( vector2 ) );
-            var line = new THREE.Line( geometry, gridmaterial );
-            groupX.add( line );
-          } else if (rand>.667) {
-            // Y
-            var vector = new THREE.Vector3( x*spacing - halfsize, y*spacing - halfsize, z*spacing - halfsize );
-            geometry.vertices.push( new THREE.Vertex( vector ) );
-            var vector2 = new THREE.Vector3( x*spacing - halfsize, y*spacing - halfsize + spacing, z*spacing - halfsize );
-            geometry.vertices.push( new THREE.Vertex( vector2 ) );
-            var line = new THREE.Line( geometry, gridmaterial );
-            groupY.add( line );
-          } else {
-            // Z
-            var vector = new THREE.Vector3( x*spacing - halfsize, y*spacing - halfsize, z*spacing - halfsize );
-            geometry.vertices.push( new THREE.Vertex( vector ) );
-            var vector2 = new THREE.Vector3( x*spacing - halfsize, y*spacing - halfsize, z*spacing - halfsize + spacing );
-            geometry.vertices.push( new THREE.Vertex( vector2 ) );
-            var line = new THREE.Line( geometry, gridmaterial );
-            groupZ.add( line );
-          }
-
+        if (Math.random()>0.99) {
+          particle = new THREE.Particle( particlematerial );
+          particle.position.x = x*spacing - halfsize;
+          particle.position.y = y*spacing - halfsize;
+          particle.position.z = z*spacing - halfsize;
+          particle.scale.x = particle.scale.y = 2;
+          groupGrid.add( particle );
         }
       }
     }
@@ -139,7 +126,7 @@ this.animate = function() {
   requestAnimationFrame( animate );
   render();
 
-}
+};
 
 
 var gotoAngle = false;
@@ -160,19 +147,19 @@ function render() {
     group.rotation.y = mouseX/windowHalfX * RIGHTANGLE;
   }
 
-  // Move photons
-  groupX.children[Math.floor(Math.random()*groupX.children.length)].position.x -= spacing;
-  groupX.children[Math.floor(Math.random()*groupX.children.length)].position.x += spacing;
-  groupY.children[Math.floor(Math.random()*groupY.children.length)].position.y -= spacing;
-  groupY.children[Math.floor(Math.random()*groupY.children.length)].position.y += spacing;
-  groupZ.children[Math.floor(Math.random()*groupZ.children.length)].position.z -= spacing;
-  groupZ.children[Math.floor(Math.random()*groupZ.children.length)].position.z += spacing;
+  // Move grid dots
+  // groupX.children[Math.floor(Math.random()*groupX.children.length)].position.x -= spacing;
+  // groupX.children[Math.floor(Math.random()*groupX.children.length)].position.x += spacing;
+  // groupY.children[Math.floor(Math.random()*groupY.children.length)].position.y -= spacing;
+  // groupY.children[Math.floor(Math.random()*groupY.children.length)].position.y += spacing;
+  // groupZ.children[Math.floor(Math.random()*groupZ.children.length)].position.z -= spacing;
+  // groupZ.children[Math.floor(Math.random()*groupZ.children.length)].position.z += spacing;
 
   renderer.render( scene, camera );
 }
 
 
-MOA2012ANIMATION.gotoAngle = function(x, y, z) {
+var gotoAngle = function(x, y, z) {
   gotoAngle = true;
 
   tweenRotation = { x: group.rotation.x, y: group.rotation.y, z: group.rotation.z };
@@ -180,9 +167,9 @@ MOA2012ANIMATION.gotoAngle = function(x, y, z) {
   tween = new TWEEN.Tween(tweenRotation).to(target, 2000)
     .easing(TWEEN.Easing.Quadratic.EaseInOut)
     .start();
-}
+};
 
-MOA2012ANIMATION.cameraLoop = function() {
+var cameraLoop = function() {
   gotoAngle = true;
 
   tweenRotation = { x: group.rotation.x, y: group.rotation.y, z: group.rotation.z };
@@ -190,24 +177,217 @@ MOA2012ANIMATION.cameraLoop = function() {
   var top = { x: 1.5708, y: 0, z: 0 }
   var right = { x: 0, y: -1.5708, z: 0 };
 
-  tweenTop = new TWEEN.Tween(tweenRotation)
+  var firstTop = new TWEEN.Tween(tweenRotation)
     .to(top, 2000)
-    .delay(4000)
+    .delay(500)
     .easing(TWEEN.Easing.Quadratic.EaseInOut)
     .start();
+
+  var tweenTop = new TWEEN.Tween(tweenRotation)
+    .to(top, 2000)
+    .delay(4000)
+    .easing(TWEEN.Easing.Quadratic.EaseInOut);
 
   var tweenRight = new TWEEN.Tween(tweenRotation)
     .to(right, 2000)
     .delay(4000)
     .easing(TWEEN.Easing.Quadratic.EaseInOut);
 
+  // first
+  firstTop.chain(tweenRight); 
   // loop
-  tweenTop.chain(tweenRight);
   tweenRight.chain(tweenTop); 
+  tweenTop.chain(tweenRight);
+};
+
+
+// Letters
+
+var chars = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','ä','ö',' ','-','_'];
+var charSegments = [
+// 1 2 3 4 5 6 7 8 9 101112131415161718192021
+  [1,1,1,1,0,0,1,0,1,1,0,1,0,0,0,0,0,0,0,0,0], //a
+  [1,1,1,1,1,1,1,0,1,1,0,1,0,0,0,0,0,0,0,0,0], //b
+  [1,1,0,0,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0], //c
+  [1,0,0,0,1,0,1,0,0,1,0,0,0,1,0,0,0,0,0,1,0], //d
+  [1,1,1,0,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0], //e
+  [1,1,1,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0], //f XXX
+  [1,1,0,1,1,1,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0], //g
+  [0,0,1,1,0,0,1,0,1,1,0,1,0,0,0,0,0,0,0,0,0], //h
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //i
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //j
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //k
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //l
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //m
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //n
+  [1,1,0,0,1,1,1,0,1,1,0,1,0,0,0,0,0,0,0,0,0], //o
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //p
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //q
+  [1,1,1,1,0,0,1,0,1,1,0,0,0,0,0,1,0,0,0,0,0], //r
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //s
+  [1,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0], //t
+  [0,0,0,0,1,1,1,0,1,1,0,1,0,0,0,0,0,0,0,0,0], //u
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //v
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //w
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //x
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //y
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //z
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1], //ä
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1], //ö
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //' '
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //-
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] //_
+];
+
+var lettermaterial = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 1, linewidth: 3, linecap: "butt" } );
+
+var geoAddPoint = function (geometry, x, y, z) {
+  geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( x*spacing - halfsize, y*spacing - halfsize, z*spacing - halfsize ) ) );
+}
+
+var drawsegment = function(i, x, y) {
+  var geometry = new THREE.Geometry();
+
+  var randomZ = Math.floor(Math.random()*count);
+  var randomZ2 = randomZ + (Math.random()>.5 ? -1 : 1);
+
+  switch (i) {
+    case 0:
+      geoAddPoint(geometry, 0+x, 0+y, randomZ);
+      geoAddPoint(geometry, 1+x, 0+y, randomZ2);
+      break;
+    case 1:
+      geoAddPoint(geometry, 1+x, 0+y, randomZ);
+      geoAddPoint(geometry, 2+x, 0+y, randomZ2);
+      break;
+    case 2:
+      geoAddPoint(geometry, 0+x, 1+y, randomZ);
+      geoAddPoint(geometry, 1+x, 1+y, randomZ2);
+      break;
+    case 3:
+      geoAddPoint(geometry, 1+x, 1+y, randomZ);
+      geoAddPoint(geometry, 2+x, 1+y, randomZ2);
+      break;
+    case 4:
+      geoAddPoint(geometry, 0+x, 2+y, randomZ);
+      geoAddPoint(geometry, 1+x, 2+y, randomZ2);
+      break;
+    case 5:
+      geoAddPoint(geometry, 1+x, 2+y, randomZ);
+      geoAddPoint(geometry, 2+x, 2+y, randomZ2);
+      break;
+    case 6:
+      geoAddPoint(geometry, 0+x, 0+y, randomZ);
+      geoAddPoint(geometry, 0+x, 1+y, randomZ2);
+      break;
+    case 7:
+      geoAddPoint(geometry, 1+x, 0+y, randomZ);
+      geoAddPoint(geometry, 1+x, 1+y, randomZ2);
+      break;
+    case 8:
+      geoAddPoint(geometry, 2+x, 0+y, randomZ);
+      geoAddPoint(geometry, 2+x, 1+y, randomZ2);
+      break;
+    case 9:
+      geoAddPoint(geometry, 0+x, 1+y, randomZ);
+      geoAddPoint(geometry, 0+x, 2+y, randomZ2);
+      break;
+    case 10:
+      geoAddPoint(geometry, 1+x, 1+y, randomZ);
+      geoAddPoint(geometry, 1+x, 2+y, randomZ2);
+      break;
+    case 11:
+      geoAddPoint(geometry, 2+x, 1+y, randomZ);
+      geoAddPoint(geometry, 2+x, 2+y, randomZ2);
+      break;
+    case 12:
+      geoAddPoint(geometry, 0+x, 0+y, randomZ);
+      geoAddPoint(geometry, 1+x, 1+y, randomZ2);
+      break;
+    case 13:
+      geoAddPoint(geometry, 1+x, 0+y, randomZ);
+      geoAddPoint(geometry, 2+x, 1+y, randomZ2);
+      break;
+    case 14:
+      geoAddPoint(geometry, 0+x, 1+y, randomZ);
+      geoAddPoint(geometry, 1+x, 2+y, randomZ2);
+      break;
+    case 15:
+      geoAddPoint(geometry, 1+x, 1+y, randomZ);
+      geoAddPoint(geometry, 2+x, 2+y, randomZ2);
+      break;
+    case 16:
+      geoAddPoint(geometry, 1+x, 0+y, randomZ);
+      geoAddPoint(geometry, 0+x, 1+y, randomZ2);
+      break;
+    case 17:
+      geoAddPoint(geometry, 2+x, 0+y, randomZ);
+      geoAddPoint(geometry, 1+x, 1+y, randomZ2);
+      break;
+    case 18:
+      geoAddPoint(geometry, 1+x, 1+y, randomZ);
+      geoAddPoint(geometry, 0+x, 2+y, randomZ2);
+      break;
+    case 19:
+      geoAddPoint(geometry, 2+x, 1+y, randomZ);
+      geoAddPoint(geometry, 1+x, 2+y, randomZ2);
+      break;
+    case 20: // dots
+      geoAddPoint(geometry, 0+x, -0.5+y, randomZ);
+      geoAddPoint(geometry, 2+x, -0.5+y, randomZ2);
+      break;
+    default:
+      break;
+  }
+
+  var line = new THREE.Line( geometry, lettermaterial );
+
+  return line;
+}
+
+var drawtext = function(text) {
+  var word = new THREE.Object3D();
+
+  var characters = text.split("");
+  for (var i = 0; i<characters.length; i++) {
+    var charIndex = chars.indexOf(characters[i]);
+    if (charIndex !== -1) {
+      var segments = charSegments[charIndex];
+
+      for (var j=0; j<22; j++) {
+        if (segments[j] === 1) {
+          if (i<11) {
+            word.add( drawsegment(j, (i*3)+4, 16) );
+          } else {
+            word.add( drawsegment(j, (i%11*3)+4, 19) );
+          }
+        }
+      }
+
+    }
+  }
+
+  word.rotation.y = Math.PI;
+  word.rotation.z = Math.PI;
+  return word;
+}
+
+MOA2012ANIMATION.setTexts = function(_texts) {
+  var texts = _texts;
+
+  var word1 = drawtext(_texts[0]);
+
+  word1.rotation.x -= RIGHTANGLE;
+  group.add(word1);
+
+  cameraLoop();
+
 }
 
 // Start
 init();
 animate();
+
+return MOA2012ANIMATION;
 
 };
