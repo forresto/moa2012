@@ -1,5 +1,10 @@
 var MOA2012ANIMATION = function(divId, _w, _h, _count){
 
+if (!divId) { return false; }
+if (!_w) { _w=720; }
+if (!_h) { _h=220; }
+if (!_count) { _count=40; }
+
 var container;
 var camera, scene, renderer, group, groupX, groupY, groupZ, particle;
 var mouseX = 0, mouseY = 0;
@@ -22,6 +27,12 @@ var spacing = Math.floor(size/count);
 
 var lettermaterial1 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: 3, linecap: "butt" } );
 var lettermaterial2 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: 3, linecap: "butt" } );
+
+// All the phrases to spell
+var texts;
+var text_index = 0;
+var top_text, right_text, text_is_on_top;
+
 
 this.init = function() {
 
@@ -69,7 +80,7 @@ this.init = function() {
   for (var x=0; x<count; x++) {
     for (var y=0; y<count; y++) {
       for (var z=0; z<count; z++) {
-        if (Math.random()>0.99) {
+        if (Math.random()>0.995) {
           particle = new THREE.Particle( particlematerial );
           particle.position.x = x*spacing - halfsize;
           particle.position.y = y*spacing - halfsize;
@@ -185,17 +196,20 @@ var cameraLoop = function() {
   var firstTop = new TWEEN.Tween(tweenRotation)
     .to(top, 2000)
     .delay(500)
+    .onComplete(nextText)
     .easing(TWEEN.Easing.Quadratic.EaseInOut)
     .start();
 
   var tweenTop = new TWEEN.Tween(tweenRotation)
     .to(top, 2000)
     .delay(4000)
+    .onComplete(nextText)
     .easing(TWEEN.Easing.Quadratic.EaseInOut);
 
   var tweenRight = new TWEEN.Tween(tweenRotation)
     .to(right, 2000)
     .delay(4000)
+    .onComplete(nextText)
     .easing(TWEEN.Easing.Quadratic.EaseInOut);
 
   // first
@@ -371,13 +385,40 @@ var drawtext = function(text, _material) {
   return word;
 }
 
+var nextText = function() {
+  text_index++;
+  if (text_index >= texts.length) {
+    text_index = 0;
+  }
+  text_is_on_top = !text_is_on_top;
+
+  if (text_is_on_top){
+    // top
+    if (top_text){ group.remove(top_text); }
+
+    top_text = drawtext(texts[text_index], lettermaterial1);
+    top_text.rotation.x -= RIGHTANGLE;
+    group.add(top_text);
+  } else {
+    //right
+    if (right_text){ group.remove(right_text); }
+
+    right_text = drawtext(texts[text_index], lettermaterial2);
+    right_text.rotation.y += RIGHTANGLE;
+    group.add(right_text);
+  }
+
+}
+
 MOA2012ANIMATION.setTexts = function(_texts) {
-  var texts = _texts;
+  texts = _texts;
+  text_index = 0;
+  text_is_on_top = true;
 
-  var word1 = drawtext(_texts[0], lettermaterial1);
+  top_text = drawtext(texts[0], lettermaterial1);
 
-  word1.rotation.x -= RIGHTANGLE;
-  group.add(word1);
+  top_text.rotation.x -= RIGHTANGLE;
+  group.add(top_text);
 
   cameraLoop();
 
