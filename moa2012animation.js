@@ -20,6 +20,9 @@ var halfsize = size/2;
 var count = _count;
 var spacing = Math.floor(size/count);
 
+var lettermaterial1 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: 3, linecap: "butt" } );
+var lettermaterial2 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: 3, linecap: "butt" } );
+
 this.init = function() {
 
   // container = document.createElement( 'div' );
@@ -142,6 +145,8 @@ function render() {
     group.rotation.x = tweenRotation.x;
     group.rotation.y = tweenRotation.y;
     group.rotation.z = tweenRotation.z;
+    lettermaterial1.opacity = tweenRotation.opacity1;
+    lettermaterial2.opacity = tweenRotation.opacity2;
   } else {
     group.rotation.x = mouseY/windowHalfY * RIGHTANGLE;
     group.rotation.y = mouseX/windowHalfX * RIGHTANGLE;
@@ -172,10 +177,10 @@ var gotoAngle = function(x, y, z) {
 var cameraLoop = function() {
   gotoAngle = true;
 
-  tweenRotation = { x: group.rotation.x, y: group.rotation.y, z: group.rotation.z };
+  tweenRotation = { x: group.rotation.x, y: group.rotation.y, z: group.rotation.z, opacity1: 0, opacity2: 0 };
 
-  var top = { x: 1.5708, y: 0, z: 0 }
-  var right = { x: 0, y: -1.5708, z: 0 };
+  var top = { x: 1.5708, y: 0, z: 0, opacity1: 1, opacity2: 0 }
+  var right = { x: 0, y: -1.5708, z: 0, opacity1: 0, opacity2: 1 };
 
   var firstTop = new TWEEN.Tween(tweenRotation)
     .to(top, 2000)
@@ -219,33 +224,31 @@ var charSegments = [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //k
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //l
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //m
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //n
+  [0,0,0,0,0,0,1,0,1,1,0,1,1,0,0,1,0,0,0,0,0], //n
   [1,1,0,0,1,1,1,0,1,1,0,1,0,0,0,0,0,0,0,0,0], //o
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //p
+  [1,1,1,1,0,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0], //p
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //q
   [1,1,1,1,0,0,1,0,1,1,0,0,0,0,0,1,0,0,0,0,0], //r
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //s
   [1,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0], //t
   [0,0,0,0,1,1,1,0,1,1,0,1,0,0,0,0,0,0,0,0,0], //u
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //v
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //w
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //x
+  [0,0,0,0,1,1,1,0,1,1,1,1,0,0,0,0,0,0,0,0,0], //w
+  [0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,1,1,0,0], //x
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //y
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //z
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1], //ä
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1], //ö
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //' '
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //-
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] //_
+  [0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], //-
+  [0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] //_
 ];
-
-var lettermaterial = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 1, linewidth: 3, linecap: "butt" } );
 
 var geoAddPoint = function (geometry, x, y, z) {
   geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( x*spacing - halfsize, y*spacing - halfsize, z*spacing - halfsize ) ) );
 }
 
-var drawsegment = function(i, x, y) {
+var drawsegment = function(i, x, y, _material) {
   var geometry = new THREE.Geometry();
 
   var randomZ = Math.floor(Math.random()*count);
@@ -340,12 +343,12 @@ var drawsegment = function(i, x, y) {
       break;
   }
 
-  var line = new THREE.Line( geometry, lettermaterial );
+  var line = new THREE.Line( geometry, _material );
 
   return line;
 }
 
-var drawtext = function(text) {
+var drawtext = function(text, _material) {
   var word = new THREE.Object3D();
 
   var characters = text.split("");
@@ -356,11 +359,7 @@ var drawtext = function(text) {
 
       for (var j=0; j<22; j++) {
         if (segments[j] === 1) {
-          if (i<11) {
-            word.add( drawsegment(j, (i*3)+4, 16) );
-          } else {
-            word.add( drawsegment(j, (i%11*3)+4, 19) );
-          }
+          word.add( drawsegment(j, (i%11*3)+4, Math.floor(i/11)*3+16, _material) );
         }
       }
 
@@ -375,7 +374,7 @@ var drawtext = function(text) {
 MOA2012ANIMATION.setTexts = function(_texts) {
   var texts = _texts;
 
-  var word1 = drawtext(_texts[0]);
+  var word1 = drawtext(_texts[0], lettermaterial1);
 
   word1.rotation.x -= RIGHTANGLE;
   group.add(word1);
