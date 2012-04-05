@@ -133,6 +133,7 @@ var init = function() {
 
   renderer = new THREE.CanvasRenderer();
   renderer.setSize( WIDTH, HEIGHT );
+  renderer.setClearColorHex ( 0x000000, 1 );
   container.appendChild( renderer.domElement );
 
   // container.addEventListener( 'mousemove', onDocumentMouseMove, false );
