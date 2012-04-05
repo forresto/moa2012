@@ -1,4 +1,6 @@
-var MOA2012ANIMATION = function(divId, _w, _h, _count){
+var MOA2012ANIMATION = MOA2012ANIMATION || function(divId, _w, _h, _count){
+
+"use strict";
 
 if (!divId) { return false; }
 if (!_w) { _w=720; }
@@ -6,7 +8,7 @@ if (!_h) { _h=220; }
 if (!_count) { _count=40; }
 
 var container;
-var camera, scene, renderer, group, groupX, groupY, groupZ, particle;
+var camera, scene, renderer, group, groupGrid, particle;
 var mouseX = 0, mouseY = 0;
 
 var WIDTH = _w;
@@ -34,7 +36,7 @@ var text_index = 0;
 var top_text, right_text, text_is_on_top;
 
 
-this.init = function() {
+var init = function() {
 
   // container = document.createElement( 'div' );
   // document.body.appendChild( container );
@@ -135,7 +137,7 @@ function onDocumentTouchMove( event ) {
 
 //
 
-this.animate = function() {
+var animate = function() {
 
   requestAnimationFrame( animate );
   render();
@@ -368,7 +370,8 @@ var drawtext = function(text, _material) {
   var word = new THREE.Object3D();
 
   var characters = text.split("");
-  for (var i = 0; i<characters.length; i++) {
+  var text_length = characters.length <= 33 ? characters.length : 33;
+  for (var i = 0; i<text_length; i++) {
     var charIndex = chars.indexOf(characters[i]);
     if (charIndex !== -1) {
       var segments = charSegments[charIndex];
