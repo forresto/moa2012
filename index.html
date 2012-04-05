@@ -6,10 +6,8 @@
   <meta name="author" content="forresto">
   <meta name="description" content="canvas animation for Aalto Master of Arts show" />
   
-  <!--
   <script type="text/javascript" src="ThreeCanvas.js"></script>
   <script type="text/javascript" src="Tween.js"></script>
-  -->
 
   <style type="text/css">
     body {
@@ -34,9 +32,11 @@
   <div id="moa_box_animation" style="display: inline-block; width: 220px; height:220px">
   </div>
   -->
-  <script type="text/javascript" src="moa2012animation-lib-min.js"></script>
+  <script type="text/javascript" src="moa2012animation.js"></script>
+  <!-- <script type="text/javascript" src="moa2012animation-lib-min.js"></script> -->
   <script type="text/javascript">
 
+    // pass the div id:
     MOA2012ANIMATION("moabar_animation");
     MOA2012ANIMATION.setTexts([
       "the future- now open    for ___",
@@ -45,9 +45,7 @@
       "design and  other such  like and",
       "             _-oöo-_"
     ]);
-
-    // var boxAnimation = MOA2012ANIMATION("moabar_animation", 220, 220, 20);
-    // boxAnimation.setTexts(["abcdef fedcba","fedcba abc"]);
+    // MOA2012ANIMATION.addText("hoooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
 
   </script>
   

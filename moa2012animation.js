@@ -31,9 +31,11 @@ var lettermaterial1 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0
 var lettermaterial2 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: 3, linecap: "butt" } );
 
 // All the phrases to spell
-var texts;
+var texts = [];
 var text_index = 0;
-var top_text, right_text, text_is_on_top;
+var top_text, right_text;
+var text_is_on_top = true;
+var looping = false;
 
 
 var init = function() {
@@ -64,7 +66,9 @@ var init = function() {
   // group.add( groupZ );
   groupGrid = new THREE.Object3D();
   group.add( groupGrid );
-
+  group.position.y = 9;
+  group.position.x = 11;
+  group.position.z = 2;
 
 
   scene.add( group );
@@ -98,12 +102,13 @@ var init = function() {
   renderer.setSize( WIDTH, HEIGHT );
   container.appendChild( renderer.domElement );
 
-  container.addEventListener( 'mousemove', onDocumentMouseMove, false );
-  container.addEventListener( 'click', onDocumentMouseClick, false );
-  container.addEventListener( 'touchstart', onDocumentTouchStart, false );
-  container.addEventListener( 'touchmove', onDocumentTouchMove, false );
+  // container.addEventListener( 'mousemove', onDocumentMouseMove, false );
+  // container.addEventListener( 'click', onDocumentMouseClick, false );
+  // container.addEventListener( 'touchstart', onDocumentTouchStart, false );
+  // container.addEventListener( 'touchmove', onDocumentTouchMove, false );
 }
 
+/*
 function onDocumentMouseMove( event ) {
   mouseX = event.clientX - windowHalfX;
   mouseY = event.clientY - windowHalfY;
@@ -134,8 +139,7 @@ function onDocumentTouchMove( event ) {
     mouseY = event.touches[ 0 ].pageY - windowHalfY;
   }
 }
-
-//
+*/
 
 var animate = function() {
 
@@ -152,7 +156,7 @@ var gotoAngleX, gotoAngleY, gotoAngleZ;
 
 function render() {
 
-  // Rotate group
+  // Rotate group and fade
   if (tweenRotation && gotoAngle) {
     TWEEN.update();
     group.rotation.x = tweenRotation.x;
@@ -166,12 +170,15 @@ function render() {
   }
 
   // Move grid dots
-  // groupX.children[Math.floor(Math.random()*groupX.children.length)].position.x -= spacing;
-  // groupX.children[Math.floor(Math.random()*groupX.children.length)].position.x += spacing;
-  // groupY.children[Math.floor(Math.random()*groupY.children.length)].position.y -= spacing;
-  // groupY.children[Math.floor(Math.random()*groupY.children.length)].position.y += spacing;
-  // groupZ.children[Math.floor(Math.random()*groupZ.children.length)].position.z -= spacing;
-  // groupZ.children[Math.floor(Math.random()*groupZ.children.length)].position.z += spacing;
+  var randomdot = groupGrid.children[Math.floor(Math.random()*groupGrid.children.length)];
+  var move_rand = Math.random();
+  if (move_rand<.333) {
+    randomdot.position.x += (Math.random() > .5 ? spacing : -spacing);
+  } else if (move_rand>=.667) {
+    randomdot.position.y += (Math.random() > .5 ? spacing : -spacing);
+  } else {
+    randomdot.position.z += (Math.random() > .5 ? spacing : -spacing);
+  }
 
   renderer.render( scene, camera );
 }
@@ -188,31 +195,35 @@ var gotoAngle = function(x, y, z) {
 };
 
 var cameraLoop = function() {
-  gotoAngle = true;
+  looping = true;
 
   tweenRotation = { x: group.rotation.x, y: group.rotation.y, z: group.rotation.z, opacity1: 0, opacity2: 0 };
 
   var top = { x: 1.5708, y: 0, z: 0, opacity1: 0.8, opacity2: 0 }
   var right = { x: 0, y: -1.5708, z: 0, opacity1: 0, opacity2: 0.8 };
 
+  var tween_curve = TWEEN.Easing.Quintic.EaseInOut;
+  var tween_time = 4000;
+  var tween_delay = 4000;
+
   var firstTop = new TWEEN.Tween(tweenRotation)
-    .to(top, 2000)
+    .to(top, tween_time)
     .delay(500)
     .onComplete(nextText)
-    .easing(TWEEN.Easing.Quadratic.EaseInOut)
+    .easing(tween_curve)
     .start();
 
   var tweenTop = new TWEEN.Tween(tweenRotation)
-    .to(top, 2000)
-    .delay(4000)
+    .to(top, tween_time)
+    .delay(tween_delay)
     .onComplete(nextText)
-    .easing(TWEEN.Easing.Quadratic.EaseInOut);
+    .easing(tween_curve);
 
   var tweenRight = new TWEEN.Tween(tweenRotation)
-    .to(right, 2000)
-    .delay(4000)
+    .to(right, tween_time)
+    .delay(tween_delay)
     .onComplete(nextText)
-    .easing(TWEEN.Easing.Quadratic.EaseInOut);
+    .easing(tween_curve);
 
   // first
   firstTop.chain(tweenRight); 
@@ -266,10 +277,9 @@ var geoAddPoint = function (geometry, x, y, z) {
   geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( x*spacing - halfsize, y*spacing - halfsize, z*spacing - halfsize ) ) );
 }
 
-var drawsegment = function(i, x, y, _material) {
+var drawsegment = function(i, x, y, randomZ, _material) {
   var geometry = new THREE.Geometry();
 
-  var randomZ = Math.floor(Math.random()*count);
   var randomZ2 = randomZ + (Math.random()>.5 ? -1 : 1);
 
   switch (i) {
@@ -375,10 +385,13 @@ var drawtext = function(text, _material) {
     var charIndex = chars.indexOf(characters[i]);
     if (charIndex !== -1) {
       var segments = charSegments[charIndex];
+      var x = i%11*3 + 4;
+      var y = Math.floor(i/11)*3 + 17;
+      var randomZ = Math.floor(count/4 + Math.random()*count/2);
 
       for (var j=0; j<22; j++) {
         if (segments[j] === 1) {
-          word.add( drawsegment(j, (i%11*3)+4, Math.floor(i/11)*3+17, _material) );
+          word.add( drawsegment(j, x, y, randomZ, _material) );
         }
       }
 
@@ -410,6 +423,8 @@ var nextText = function() {
 
     right_text = drawtext(texts[text_index], lettermaterial2);
     right_text.rotation.y += RIGHTANGLE;
+    right_text.position.y = -2;
+    right_text.position.z = -2;
     group.add(right_text);
   }
 
@@ -418,15 +433,20 @@ var nextText = function() {
 MOA2012ANIMATION.setTexts = function(_texts) {
   texts = _texts;
   text_index = 0;
-  text_is_on_top = true;
 
   top_text = drawtext(texts[0], lettermaterial1);
 
   top_text.rotation.x -= RIGHTANGLE;
   group.add(top_text);
 
-  cameraLoop();
+  if (!looping) {
+    cameraLoop();
+  }
 
+}
+MOA2012ANIMATION.addText = function(_text) {
+  texts.push(_text);
+  MOA2012ANIMATION.setTexts(texts);
 }
 
 // Start
