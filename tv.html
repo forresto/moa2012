@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>aalto MoA 2012 tv animation</title>
+  <meta name="author" content="forresto">
+  <meta name="description" content="canvas animation for Aalto Master of Arts show" />
+  
+  <style type="text/css">
+    body {
+      background-color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    #moabar_animation {
+      height: 720px;
+      margin-bottom: 20px;
+      width: 1280px;
+    }
+/*    #moabar_animation {
+      background: url("img/yearshow_220x220px.png") no-repeat scroll left top transparent;
+      height: 220px;
+      margin-bottom: 20px;
+      width: 220px;
+    }
+*/
+  </style>
+</head>
+<body>
+
+  <div id="moabar_animation" >
+  </div>
+
+  <!-- 
+  <br/>
+  <br/>
+
+  <div id="moa_box_animation" style="display: inline-block; width: 220px; height:220px">
+  </div>
+  -->
+
+  <script type="text/javascript" src="three.js/build/Three.js"></script>
+  <script type="text/javascript" src="Tween.js"></script>
+  <script type="text/javascript" src="moa2012animation-tv.js"></script>
+  <!-- 
+  <script type="text/javascript" src="moa2012animation-lib-min.js"></script> 
+  -->
+  <script type="text/javascript">
+
+    // pass the div id:
+    MOA2012ANIMATION("moabar_animation", 1280, 720);
+    MOA2012ANIMATION.setTexts([
+      " ",
+      "tulevaisuus  avoinna",
+      "   year       show",
+      " ",
+      "                       tieteelle",
+      "                      taloudelle",
+      "                      tekniikalle",
+      "                       taiteelle"
+    ]);
+    // MOA2012ANIMATION.addText("hoooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+
+  </script>
+  
+</body>
+</html>
