@@ -41,8 +41,8 @@ if (!_h) { _h=220; }
 if (!_count) { _count=40; }
 
 var container;
-var camera, scene, renderer, group, groupGrid, particle;
-var mouseX = 0, mouseY = 0;
+var camera, scene, renderer;
+var group, groupEven, groupOdd;
 
 var WIDTH = _w;
 var HEIGHT = _h;
@@ -52,18 +52,13 @@ var windowHalfY = HEIGHT / 2;
 
 var DEGREE = Math.PI/180;
 var RIGHTANGLE = Math.PI/2;
-var THIRDWINDOW = Math.floor();
 
 // set up the grid
-var size = WIDTH*1.2;
+var size = WIDTH*1;
 var halfsize = size/2;
 var count = _count;
 var spacing = Math.floor(size/count);
-
-// var lettermaterial1 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: 7, linecap: "square", vertexColors: [new THREE.Color(0xFFFFFF), new THREE.Color(0x666666)] } );
-// var lettermaterial2 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: 7, linecap: "square", vertexColors: [new THREE.Color(0xFFFFFF), new THREE.Color(0x666666)] } );
-var lettermaterial1 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: 7, linecap: "square", linejoin: "square", vertexColors: false } );
-var lettermaterial2 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: 7, linecap: "square", linejoin: "square", vertexColors: false } );
+var PHOTONWIDTH = 3;
 
 // All the phrases to spell
 var texts = [];
@@ -71,6 +66,100 @@ var text_index = 0;
 var top_text, right_text;
 var text_is_on_top = true;
 var looping = false;
+
+
+// Materials
+var materialRight = new THREE.ParticleBasicMaterial( { 
+  map: new THREE.Texture( generatePhotonRight() ), 
+  blending: THREE.AdditiveBlending
+} );
+var materialRightOdd = new THREE.ParticleBasicMaterial( { 
+  map: new THREE.Texture( generatePhotonRight() ), 
+  blending: THREE.AdditiveBlending
+} );
+function generatePhotonRight() {
+  var canvas = document.createElement( 'canvas' );
+  canvas.width = spacing*2;
+  canvas.height = PHOTONWIDTH;
+  var context = canvas.getContext( '2d' );
+  var gradient = context.createLinearGradient( spacing, 0, canvas.width, 0 );
+  gradient.addColorStop( 0, 'rgba(255, 255, 255, 0.4)' );
+  gradient.addColorStop( 1, 'rgba(255, 255, 255, 1)' );
+  context.fillStyle = gradient;
+  context.fillRect( spacing, 0, canvas.width, canvas.height );
+  return canvas;
+}
+
+var materialDown = new THREE.ParticleBasicMaterial( { 
+  map: new THREE.Texture( generatePhotonDown() ), 
+  blending: THREE.AdditiveBlending
+} );
+var materialDownOdd = new THREE.ParticleBasicMaterial( { 
+  map: new THREE.Texture( generatePhotonDown() ), 
+  blending: THREE.AdditiveBlending
+} );
+function generatePhotonDown() {
+  var canvas = document.createElement( 'canvas' );
+  canvas.width = PHOTONWIDTH;
+  canvas.height = spacing*2;
+  var context = canvas.getContext( '2d' );
+  var gradient = context.createLinearGradient( 0, spacing, 0, canvas.height );
+  gradient.addColorStop( 0, 'rgba(255, 255, 255, 0.4)' );
+  gradient.addColorStop( 1, 'rgba(255, 255, 255, 1)' );
+  context.fillStyle = gradient;
+  context.fillRect( 0, spacing, canvas.width, canvas.height );
+  return canvas;
+}
+
+var materialDownRight = new THREE.ParticleBasicMaterial( { 
+  map: new THREE.Texture( generatePhotonDownRight() ), 
+  blending: THREE.AdditiveBlending
+} );
+var materialDownRightOdd = new THREE.ParticleBasicMaterial( { 
+  map: new THREE.Texture( generatePhotonDownRight() ), 
+  blending: THREE.AdditiveBlending
+} );
+function generatePhotonDownRight() {
+  var canvas = document.createElement( 'canvas' );
+  canvas.width = spacing*2;
+  canvas.height = spacing*2;
+  var context = canvas.getContext( '2d' );
+  var gradient = context.createLinearGradient( spacing, spacing, canvas.width, canvas.height );
+  gradient.addColorStop( 0, 'rgba(255, 255, 255, 0.4)' );
+  gradient.addColorStop( 1, 'rgba(255, 255, 255, 1)' );
+  context.fillStyle = gradient;
+  context.moveTo(spacing, spacing); 
+  context.lineTo(spacing+PHOTONWIDTH*4/3, spacing+0); 
+  context.lineTo(canvas.width, canvas.height-PHOTONWIDTH*4/3);
+  context.lineTo(canvas.width, canvas.height);
+  context.fill(); 
+  return canvas;
+}
+
+var materialDownLeft = new THREE.ParticleBasicMaterial( { 
+  map: new THREE.Texture( generatePhotonDownLeft() ), 
+  blending: THREE.AdditiveBlending
+} );
+var materialDownLeftOdd = new THREE.ParticleBasicMaterial( { 
+  map: new THREE.Texture( generatePhotonDownLeft() ), 
+  blending: THREE.AdditiveBlending
+} );
+function generatePhotonDownLeft() {
+  var canvas = document.createElement( 'canvas' );
+  canvas.width = spacing*2;
+  canvas.height = spacing*2;
+  var context = canvas.getContext( '2d' );
+  var gradient = context.createLinearGradient( spacing, spacing, 0, canvas.height );
+  gradient.addColorStop( 0, 'rgba(255, 255, 255, 0.4)' );
+  gradient.addColorStop( 1, 'rgba(255, 255, 255, 1)' );
+  context.fillStyle = gradient;
+  context.moveTo(spacing, spacing); 
+  context.lineTo(spacing-PHOTONWIDTH*4/3, spacing); 
+  context.lineTo(0, canvas.height-PHOTONWIDTH*4/3);
+  context.lineTo(0, canvas.height);
+  context.fill(); 
+  return canvas;
+}
 
 
 var init = function() {
@@ -81,26 +170,34 @@ var init = function() {
 
   // camera = new THREE.PerspectiveCamera( 75, WIDTH / HEIGHT, 1, 3000 );
   // camera.position.z = 1000;
-  var ORTHOZOOM = 1.7;
+  var ORTHOZOOM = 2;
   camera = new THREE.OrthographicCamera(-WIDTH/ORTHOZOOM, WIDTH/ORTHOZOOM, HEIGHT/ORTHOZOOM, -HEIGHT/ORTHOZOOM, -3000, 3000);
   camera.position.z = 1000;
 
   scene = new THREE.Scene();
+  MOA2012ANIMATION.scene = scene;
 
   scene.add( camera );
 
   var PI2 = Math.PI * 2;
 
+  var master = new THREE.Object3D();
+  master.rotation.x = Math.PI;
+  scene.add( master );
+
   group = new THREE.Object3D();
-  MOA2012ANIMATION.group = group;
-  groupGrid = new THREE.Object3D();
-  group.add( groupGrid );
-  group.position.y = 9;
-  group.position.x = 11;
+  // groupGrid = new THREE.Object3D();
+  // group.add( groupGrid );
+  group.position.y = 2;
+  group.position.x = 0;
   group.position.z = 2;
+  master.add( group );
 
-  scene.add( group );
+  groupEven = new THREE.Object3D();
+  group.add( groupEven );
 
+  groupOdd = new THREE.Object3D();
+  group.add( groupOdd );
 
   // var particleprogram = function (context){
   //   context.beginPath();
@@ -152,16 +249,22 @@ var gotoAngleX, gotoAngleY, gotoAngleZ;
 function render() {
 
   // Rotate group and fade
-  if (tweenRotation && gotoAngle) {
+  if (tweenRotation) {
     TWEEN.update();
     group.rotation.x = tweenRotation.x;
     group.rotation.y = tweenRotation.y;
-    group.rotation.z = tweenRotation.z;
-    lettermaterial1.opacity = tweenRotation.opacity1;
-    lettermaterial2.opacity = tweenRotation.opacity2;
+
+    materialRight.opacity = tweenRotation.opacity1;
+    materialRightOdd.opacity = tweenRotation.opacity2;
+    materialDown.opacity = tweenRotation.opacity1;
+    materialDownOdd.opacity = tweenRotation.opacity2;
+    materialDownRight.opacity = tweenRotation.opacity1;
+    materialDownRightOdd.opacity = tweenRotation.opacity2;
+    materialDownLeft.opacity = tweenRotation.opacity1;
+    materialDownLeftOdd.opacity = tweenRotation.opacity2;
   } else {
-    group.rotation.x = mouseY/windowHalfY * RIGHTANGLE;
-    group.rotation.y = mouseX/windowHalfX * RIGHTANGLE;
+    // group.rotation.x = mouseY/windowHalfY * RIGHTANGLE;
+    // group.rotation.y = mouseX/windowHalfX * RIGHTANGLE;
   }
 
   // Move grid dots
@@ -179,52 +282,67 @@ function render() {
 }
 
 
-var gotoAngle = function(x, y, z) {
-  gotoAngle = true;
+// var gotoAngle = function(x, y, z) {
+//   gotoAngle = true;
 
-  tweenRotation = { x: group.rotation.x, y: group.rotation.y, z: group.rotation.z };
-  var target = { x: x, y: y, z: z };
-  tween = new TWEEN.Tween(tweenRotation).to(target, 2000)
-    .easing(TWEEN.Easing.Quadratic.EaseInOut)
-    .start();
-};
+//   tweenRotation = { x: group.rotation.x, y: group.rotation.y, z: group.rotation.z };
+//   var target = { x: x, y: y, z: z };
+//   tween = new TWEEN.Tween(tweenRotation).to(target, 2000)
+//     .easing(TWEEN.Easing.Quadratic.EaseInOut)
+//     .start();
+// };
 
 var cameraLoop = function() {
   looping = true;
 
-  tweenRotation = { x: group.rotation.x, y: group.rotation.y, z: group.rotation.z, opacity1: 0, opacity2: 0 };
+  tweenRotation = { 
+    x: group.rotation.x, 
+    y: group.rotation.y, 
+    opacity1: 0, 
+    opacity2: 0 
+  };
 
-  var top = { x: 1.5708, y: 0, z: 0, opacity1: 0.8, opacity2: 0 }
-  var right = { x: 0, y: -1.5708, z: 0, opacity1: 0, opacity2: 0.8 };
+  var even = { 
+    x: -RIGHTANGLE, 
+    y: 0, 
+    opacity1: 0.9, 
+    opacity2: 0 
+  };
+  var odd = { 
+    x: 0, 
+    y: RIGHTANGLE, 
+    opacity1: 0, 
+    opacity2: 0.9 
+  };
 
   var tween_curve = TWEEN.Easing.Quintic.EaseInOut;
-  var tween_time = 2000;
+  var tween_time = 400;
   var tween_delay = 1000;
 
-  var firstTop = new TWEEN.Tween(tweenRotation)
-    .to(top, tween_time)
+  var firstEven = new TWEEN.Tween(tweenRotation)
+    .to(even, tween_time)
     .delay(500)
     .onComplete(nextText)
     // .easing(tween_curve)
     .start();
 
-  var tweenTop = new TWEEN.Tween(tweenRotation)
-    .to(top, tween_time)
+  var tweenEven = new TWEEN.Tween(tweenRotation)
+    .to(even, tween_time)
     .delay(tween_delay)
     .onComplete(nextText)
     // .easing(tween_curve);
 
-  var tweenRight = new TWEEN.Tween(tweenRotation)
-    .to(right, tween_time)
+  var tweenOdd = new TWEEN.Tween(tweenRotation)
+    .to(odd, tween_time)
     .delay(tween_delay)
     .onComplete(nextText)
     // .easing(tween_curve);
 
   // first
-  firstTop.chain(tweenRight); 
+  firstEven.chain(tweenEven); 
   // loop
-  tweenRight.chain(tweenTop); 
-  tweenTop.chain(tweenRight);
+  tweenEven.chain(tweenOdd); 
+  tweenOdd.chain(tweenEven);
 };
 
 
@@ -282,107 +400,121 @@ var geoAddPoint = function (geometry, x, y, z) {
   geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( x*spacing - halfsize, y*spacing - halfsize, z*spacing - halfsize ) ) );
 }
 
-var drawsegment = function(i, x, y, randomZ, _material) {
-  var geometry = new THREE.Geometry();
+var calcPosition = function (x, y, z) {
+  return {
+    x: x * spacing - halfsize,
+    y: y * spacing - halfsize,
+    z: z * spacing - halfsize
+  };
+}
 
-  var randomZ2 = randomZ + (Math.random()>.5 ? -1 : 1);
+var drawsegment = function(i, x, y, randomZ, even) {
+  // var geometry = new THREE.Geometry();
+
+  var randomZ = randomZ + Math.floor(2 - Math.random()*4);
+
+  var particleGroup = even ? groupEven : groupOdd;
+  var particleMaterial;
+  if (i < 6) {
+    particleMaterial = even ? materialRight : materialRightOdd;
+  } else if (i < 12) {
+    particleMaterial = even ? materialDown : materialDownOdd;
+    // y += 1;
+  } else if (i < 16) {
+    particleMaterial = even ? materialDownRight : materialDownRightOdd;
+    // x += 1;
+    // y += 1;
+  } else if (i < 20) {
+    particleMaterial = even ? materialDownLeft : materialDownLeftOdd;
+    // x -= 1;
+    // y += 1;
+  } else {
+    return;
+  }
+
+  var particle = new THREE.Particle( particleMaterial );
+  // particle.position.x = x*spacing - halfsize;
+  // particle.position.y = y*spacing - halfsize;
+  // particle.position.z = z*spacing - halfsize;
+  // particle.scale.x = particle.scale.y = 2;
+  // groupGrid.add( particle );
 
   switch (i) {
     case 0:
-      geoAddPoint(geometry, 0+x, 0+y, randomZ);
-      geoAddPoint(geometry, 1+x, 0+y, randomZ2);
+      particle.position = calcPosition(0+x, 0+y, randomZ);
       break;
     case 1:
-      geoAddPoint(geometry, 1+x, 0+y, randomZ);
-      geoAddPoint(geometry, 2+x, 0+y, randomZ2);
+      particle.position = calcPosition(1+x, 0+y, randomZ);
       break;
     case 2:
-      geoAddPoint(geometry, 0+x, 1+y, randomZ);
-      geoAddPoint(geometry, 1+x, 1+y, randomZ2);
+      particle.position = calcPosition(0+x, 1+y, randomZ);
       break;
     case 3:
-      geoAddPoint(geometry, 1+x, 1+y, randomZ);
-      geoAddPoint(geometry, 2+x, 1+y, randomZ2);
+      particle.position = calcPosition(1+x, 1+y, randomZ);
       break;
     case 4:
-      geoAddPoint(geometry, 0+x, 2+y, randomZ);
-      geoAddPoint(geometry, 1+x, 2+y, randomZ2);
+      particle.position = calcPosition(0+x, 2+y, randomZ);
       break;
     case 5:
-      geoAddPoint(geometry, 1+x, 2+y, randomZ);
-      geoAddPoint(geometry, 2+x, 2+y, randomZ2);
+      particle.position = calcPosition(1+x, 2+y, randomZ);
       break;
     case 6:
-      geoAddPoint(geometry, 0+x, 0+y, randomZ);
-      geoAddPoint(geometry, 0+x, 1+y, randomZ2);
+      particle.position = calcPosition(0+x, 0+y, randomZ);
       break;
     case 7:
-      geoAddPoint(geometry, 1+x, 0+y, randomZ);
-      geoAddPoint(geometry, 1+x, 1+y, randomZ2);
+      particle.position = calcPosition(1+x, 0+y, randomZ);
       break;
     case 8:
-      geoAddPoint(geometry, 2+x, 0+y, randomZ);
-      geoAddPoint(geometry, 2+x, 1+y, randomZ2);
+      particle.position = calcPosition(2+x, 0+y, randomZ);
       break;
     case 9:
-      geoAddPoint(geometry, 0+x, 1+y, randomZ);
-      geoAddPoint(geometry, 0+x, 2+y, randomZ2);
+      particle.position = calcPosition(0+x, 1+y, randomZ);
       break;
     case 10:
-      geoAddPoint(geometry, 1+x, 1+y, randomZ);
-      geoAddPoint(geometry, 1+x, 2+y, randomZ2);
+      particle.position = calcPosition(1+x, 1+y, randomZ);
       break;
     case 11:
-      geoAddPoint(geometry, 2+x, 1+y, randomZ);
-      geoAddPoint(geometry, 2+x, 2+y, randomZ2);
+      particle.position = calcPosition(2+x, 1+y, randomZ);
       break;
     case 12:
-      geoAddPoint(geometry, 0+x, 0+y, randomZ);
-      geoAddPoint(geometry, 1+x, 1+y, randomZ2);
+      particle.position = calcPosition(0+x, 0+y, randomZ);
       break;
     case 13:
-      geoAddPoint(geometry, 1+x, 0+y, randomZ);
-      geoAddPoint(geometry, 2+x, 1+y, randomZ2);
+      particle.position = calcPosition(1+x, 0+y, randomZ);
       break;
     case 14:
-      geoAddPoint(geometry, 0+x, 1+y, randomZ);
-      geoAddPoint(geometry, 1+x, 2+y, randomZ2);
+      particle.position = calcPosition(0+x, 1+y, randomZ);
       break;
     case 15:
-      geoAddPoint(geometry, 1+x, 1+y, randomZ);
-      geoAddPoint(geometry, 2+x, 2+y, randomZ2);
+      particle.position = calcPosition(1+x, 1+y, randomZ);
       break;
     case 16:
-      geoAddPoint(geometry, 1+x, 0+y, randomZ);
-      geoAddPoint(geometry, 0+x, 1+y, randomZ2);
+      particle.position = calcPosition(1+x, 0+y, randomZ);
       break;
     case 17:
-      geoAddPoint(geometry, 2+x, 0+y, randomZ);
-      geoAddPoint(geometry, 1+x, 1+y, randomZ2);
+      particle.position = calcPosition(2+x, 0+y, randomZ);
       break;
     case 18:
-      geoAddPoint(geometry, 1+x, 1+y, randomZ);
-      geoAddPoint(geometry, 0+x, 2+y, randomZ2);
+      particle.position = calcPosition(1+x, 1+y, randomZ);
       break;
     case 19:
-      geoAddPoint(geometry, 2+x, 1+y, randomZ);
-      geoAddPoint(geometry, 1+x, 2+y, randomZ2);
+      particle.position = calcPosition(2+x, 1+y, randomZ);
       break;
     case 20: // dots
-      geoAddPoint(geometry, 0+x, -0.5+y, randomZ);
-      geoAddPoint(geometry, 2+x, -0.5+y, randomZ2);
+      // particle.position = calcPosition(0+x, -0.5+y, randomZ);
       break;
     default:
       break;
   }
 
-  var line = new THREE.Line( geometry, _material );
+  // var line = new THREE.Line( geometry, _material );
+  // return line;
 
-  return line;
+  particleGroup.add( particle );
+
 }
 
-var drawtext = function(text, _material) {
-  var word = new THREE.Object3D();
+var drawtext = function(text, even) {
 
   var characters = text.split("");
   var text_length = characters.length <= 33 ? characters.length : 33;
@@ -392,20 +524,17 @@ var drawtext = function(text, _material) {
       var segments = charSegments[charIndex];
       var x = i%11*3 + 4;
       var y = Math.floor(i/11)*3 + 17;
-      var randomZ = Math.floor(count/4 + Math.random()*count/2);
+      var randomZ = Math.floor(count*4/7 - Math.random()*count*2/7 );
 
       for (var j=0; j<22; j++) {
         if (segments[j] === 1) {
-          word.add( drawsegment(j, x, y, randomZ, _material) );
+          // word.add( drawsegment(j, x, y, randomZ, _material) );
+          drawsegment(j, x, y, randomZ, even);
         }
       }
 
     }
   }
-
-  word.rotation.y = Math.PI;
-  word.rotation.z = Math.PI;
-  return word;
 }
 
 var nextText = function() {
@@ -417,20 +546,24 @@ var nextText = function() {
 
   if (text_is_on_top){
     // top
-    if (top_text){ group.remove(top_text); }
+    if (groupEven) { group.remove(groupEven); }
 
-    top_text = drawtext(texts[text_index], lettermaterial1);
-    top_text.rotation.x -= RIGHTANGLE;
-    group.add(top_text);
+    groupEven = new THREE.Object3D();
+
+    drawtext(texts[text_index], text_is_on_top);
+    groupEven.rotation.x = RIGHTANGLE;
+
+    group.add(groupEven); 
   } else {
-    //right
-    if (right_text){ group.remove(right_text); }
+    // Right
+    if (groupOdd) { group.remove(groupOdd); }
 
-    right_text = drawtext(texts[text_index], lettermaterial2);
-    right_text.rotation.y += RIGHTANGLE;
-    right_text.position.y = -2;
-    right_text.position.z = -2;
-    group.add(right_text);
+    groupOdd = new THREE.Object3D();
+
+    drawtext(texts[text_index], text_is_on_top);
+    groupOdd.rotation.y = -RIGHTANGLE;
+
+    group.add(groupOdd); 
   }
 
 }
@@ -439,10 +572,15 @@ MOA2012ANIMATION.setTexts = function(_texts) {
   texts = _texts;
   text_index = 0;
 
-  top_text = drawtext(texts[0], lettermaterial1);
+  nextText();
 
-  top_text.rotation.x -= RIGHTANGLE;
-  group.add(top_text);
+  // drawtext(texts[0], text_is_on_top);
+  // groupRight.rotation.y = -RIGHTANGLE;
+  // groupDown.rotation.x = RIGHTANGLE;
+  // groupDownRight.rotation.x = RIGHTANGLE;
+  // groupDownRight.rotation.y = -RIGHTANGLE;
+  // groupDownLeft.rotation.x = RIGHTANGLE;
+  // groupDownLeft.rotation.y = RIGHTANGLE;
 
   if (!looping) {
     cameraLoop();
