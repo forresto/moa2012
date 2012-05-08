@@ -63,8 +63,8 @@ var halfsize = size/2;
 var count = 40;
 var spacing = Math.floor(size/count);
 
-var lettermaterial1 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: settings.linewidth, linecap: "square", linejoin: "bevel" } );
-var lettermaterial2 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: settings.linewidth, linecap: "square", linejoin: "bevel" } );
+var lettermaterial1 = new THREE.LineBasicMaterial( { color: 0xF0F0F0, opacity: 0, linewidth: settings.linewidth, linecap: "butt", linejoin: "bevel" } );
+var lettermaterial2 = new THREE.LineBasicMaterial( { color: 0xF0F0F0, opacity: 0, linewidth: settings.linewidth, linecap: "butt", linejoin: "bevel" } );
 
 // All the phrases to spell
 var texts = [];
@@ -236,8 +236,8 @@ var cameraLoop = function() {
 
   tweenRotation = { x: group.rotation.x, y: group.rotation.y, z: group.rotation.z, opacity1: 0, opacity2: 0 };
 
-  var top = { x: 1.5708, y: 0, z: 0, opacity1: 0.8, opacity2: 0 }
-  var right = { x: 0, y: -1.5708, z: 0, opacity1: 0, opacity2: 0.8 };
+  var top = { x: 1.5708, y: 0, z: 0, opacity1: 1, opacity2: 0 }
+  var right = { x: 0, y: -1.5708, z: 0, opacity1: 0, opacity2: 1 };
 
   var tween_curve = TWEEN.Easing.Quintic.EaseInOut;
   var tween_time = settings.transitiontime;
@@ -329,30 +329,32 @@ var drawsegment = function(i, x, y, randomZ, _material) {
 
   var randomZ2 = randomZ + (Math.random()>.5 ? -1 : 1);
 
+  var hack = 0.1;
+
   switch (i) {
     case 0:
-      geoAddPoint(geometry, 0+x, 0+y, randomZ);
+      geoAddPoint(geometry, 0+x-hack, 0+y, randomZ);
       geoAddPoint(geometry, 1+x, 0+y, randomZ2);
       break;
     case 1:
       geoAddPoint(geometry, 1+x, 0+y, randomZ);
-      geoAddPoint(geometry, 2+x, 0+y, randomZ2);
+      geoAddPoint(geometry, 2+x+hack, 0+y, randomZ2);
       break;
     case 2:
-      geoAddPoint(geometry, 0+x, 1+y, randomZ);
+      geoAddPoint(geometry, 0+x-hack, 1+y, randomZ);
       geoAddPoint(geometry, 1+x, 1+y, randomZ2);
       break;
     case 3:
       geoAddPoint(geometry, 1+x, 1+y, randomZ);
-      geoAddPoint(geometry, 2+x, 1+y, randomZ2);
+      geoAddPoint(geometry, 2+x+hack, 1+y, randomZ2);
       break;
     case 4:
-      geoAddPoint(geometry, 0+x, 2+y, randomZ);
+      geoAddPoint(geometry, 0+x-hack, 2+y, randomZ);
       geoAddPoint(geometry, 1+x, 2+y, randomZ2);
       break;
     case 5:
       geoAddPoint(geometry, 1+x, 2+y, randomZ);
-      geoAddPoint(geometry, 2+x, 2+y, randomZ2);
+      geoAddPoint(geometry, 2+x+hack, 2+y, randomZ2);
       break;
     case 6:
       geoAddPoint(geometry, 0+x, 0+y, randomZ);
