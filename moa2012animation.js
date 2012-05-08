@@ -31,21 +31,23 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-var MOA2012ANIMATION = MOA2012ANIMATION || function(divId, _w, _h, _count){
+var MOA2012ANIMATION = MOA2012ANIMATION || function(divId, settings){
 
 "use strict";
 
 if (!divId) { return false; }
-if (!_w) { _w=720; }
-if (!_h) { _h=220; }
-if (!_count) { _count=40; }
+if (!settings) { var settings = {}; }
+if (!settings.hasOwnProperty("width")) { settings.width=720; }
+if (!settings.hasOwnProperty("height")) { settings.height=220; }
+if (!settings.hasOwnProperty("pausetime")) { settings.pausetime=2000; }
+if (!settings.hasOwnProperty("transitiontime")) { settings.transitiontime=2000; }
 
 var container;
 var camera, scene, renderer, group, groupGrid, particle;
 var mouseX = 0, mouseY = 0;
 
-var WIDTH = _w;
-var HEIGHT = _h;
+var WIDTH = settings.width;
+var HEIGHT = settings.height;
 
 var windowHalfX = WIDTH / 2;
 var windowHalfY = HEIGHT / 2;
@@ -57,7 +59,7 @@ var THIRDWINDOW = Math.floor();
 // set up the grid
 var size = WIDTH*1.2;
 var halfsize = size/2;
-var count = _count;
+var count = 40;
 var spacing = Math.floor(size/count);
 
 var lettermaterial1 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: 3, linecap: "butt" } );
@@ -237,8 +239,8 @@ var cameraLoop = function() {
   var right = { x: 0, y: -1.5708, z: 0, opacity1: 0, opacity2: 0.8 };
 
   var tween_curve = TWEEN.Easing.Quintic.EaseInOut;
-  var tween_time = 4000;
-  var tween_delay = 4000;
+  var tween_time = settings.transitiontime;
+  var tween_delay = settings.pausetime;
 
   var firstTop = new TWEEN.Tween(tweenRotation)
     .to(top, tween_time)
