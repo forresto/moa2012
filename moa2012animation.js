@@ -41,6 +41,7 @@ if (!settings.hasOwnProperty("width")) { settings.width=720; }
 if (!settings.hasOwnProperty("height")) { settings.height=220; }
 if (!settings.hasOwnProperty("pausetime")) { settings.pausetime=2000; }
 if (!settings.hasOwnProperty("transitiontime")) { settings.transitiontime=2000; }
+if (!settings.hasOwnProperty("linewidth")) { settings.linewidth=5; }
 
 var container;
 var camera, scene, renderer, group, groupGrid, particle;
@@ -62,8 +63,8 @@ var halfsize = size/2;
 var count = 40;
 var spacing = Math.floor(size/count);
 
-var lettermaterial1 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: 3, linecap: "butt" } );
-var lettermaterial2 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: 3, linecap: "butt" } );
+var lettermaterial1 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: settings.linewidth, linecap: "square", linejoin: "bevel" } );
+var lettermaterial2 = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0, linewidth: settings.linewidth, linecap: "square", linejoin: "bevel" } );
 
 // All the phrases to spell
 var texts = [];
