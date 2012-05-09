@@ -41,7 +41,10 @@ if (!settings.hasOwnProperty("width")) { settings.width=720; }
 if (!settings.hasOwnProperty("height")) { settings.height=220; }
 if (!settings.hasOwnProperty("pausetime")) { settings.pausetime=2000; }
 if (!settings.hasOwnProperty("transitiontime")) { settings.transitiontime=2000; }
+if (!settings.hasOwnProperty("color")) { settings.color=0xF0F0F0; }
 if (!settings.hasOwnProperty("linewidth")) { settings.linewidth=5; }
+if (!settings.hasOwnProperty("linecap")) { settings.linecap="butt"; }
+if (!settings.hasOwnProperty("linejoin")) { settings.linejoin="bevel"; }
 
 var container;
 var camera, scene, renderer, group, groupGrid, particle;
@@ -63,8 +66,9 @@ var halfsize = size/2;
 var count = 40;
 var spacing = Math.floor(size/count);
 
-var lettermaterial1 = new THREE.LineBasicMaterial( { color: 0xF0F0F0, opacity: 0, linewidth: settings.linewidth, linecap: "butt", linejoin: "bevel" } );
-var lettermaterial2 = new THREE.LineBasicMaterial( { color: 0xF0F0F0, opacity: 0, linewidth: settings.linewidth, linecap: "butt", linejoin: "bevel" } );
+var materialSettings = { color: 0xF0F0F0, opacity: 0, linewidth: settings.linewidth, linecap: settings.linecap, linejoin: settings.linejoin };
+var lettermaterial1 = new THREE.LineBasicMaterial( materialSettings );
+var lettermaterial2 = new THREE.LineBasicMaterial( materialSettings );
 
 // All the phrases to spell
 var texts = [];
@@ -329,7 +333,7 @@ var drawsegment = function(i, x, y, randomZ, _material) {
 
   var randomZ2 = randomZ + (Math.random()>.5 ? -1 : 1);
 
-  var hack = 0.1;
+  var hack = 0.05;
 
   switch (i) {
     case 0:
