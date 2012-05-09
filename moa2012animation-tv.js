@@ -254,14 +254,14 @@ function render() {
     group.rotation.x = tweenRotation.x;
     group.rotation.y = tweenRotation.y;
 
-    // materialRight.opacity = tweenRotation.opacity1;
-    // materialRightOdd.opacity = tweenRotation.opacity2;
-    // materialDown.opacity = tweenRotation.opacity1;
-    // materialDownOdd.opacity = tweenRotation.opacity2;
-    // materialDownRight.opacity = tweenRotation.opacity1;
-    // materialDownRightOdd.opacity = tweenRotation.opacity2;
-    // materialDownLeft.opacity = tweenRotation.opacity1;
-    // materialDownLeftOdd.opacity = tweenRotation.opacity2;
+    materialRight.opacity = tweenRotation.opacity1;
+    materialRightOdd.opacity = tweenRotation.opacity2;
+    materialDown.opacity = tweenRotation.opacity1;
+    materialDownOdd.opacity = tweenRotation.opacity2;
+    materialDownRight.opacity = tweenRotation.opacity1;
+    materialDownRightOdd.opacity = tweenRotation.opacity2;
+    materialDownLeft.opacity = tweenRotation.opacity1;
+    materialDownLeftOdd.opacity = tweenRotation.opacity2;
   } else {
     // group.rotation.x = mouseY/windowHalfY * RIGHTANGLE;
     // group.rotation.y = mouseX/windowHalfX * RIGHTANGLE;
@@ -298,21 +298,21 @@ var cameraLoop = function() {
   tweenRotation = { 
     x: group.rotation.x, 
     y: group.rotation.y, 
-    // opacity1: 0, 
-    // opacity2: 0 
+    opacity1: 0, 
+    opacity2: 0 
   };
 
   var even = { 
     x: -RIGHTANGLE, 
     y: 0, 
-    // opacity1: 0.9, 
-    // opacity2: 0 
+    opacity1: 0.9, 
+    opacity2: 0 
   };
   var odd = { 
     x: 0, 
     y: RIGHTANGLE, 
-    // opacity1: 0, 
-    // opacity2: 0.9 
+    opacity1: 0, 
+    opacity2: 0.9 
   };
 
   var tween_curve = TWEEN.Easing.Quintic.EaseInOut;
