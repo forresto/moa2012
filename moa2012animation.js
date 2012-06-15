@@ -42,6 +42,7 @@ if (!settings.hasOwnProperty("height")) { settings.height=220; }
 if (!settings.hasOwnProperty("pausetime")) { settings.pausetime=2000; }
 if (!settings.hasOwnProperty("transitiontime")) { settings.transitiontime=2000; }
 if (!settings.hasOwnProperty("color")) { settings.color=0xF0F0F0; }
+if (!settings.hasOwnProperty("opacity")) { settings.opacity=1; }
 if (!settings.hasOwnProperty("linewidth")) { settings.linewidth=5; }
 if (!settings.hasOwnProperty("linecap")) { settings.linecap="butt"; }
 if (!settings.hasOwnProperty("linejoin")) { settings.linejoin="bevel"; }
@@ -66,7 +67,13 @@ var halfsize = size/2;
 var count = 40;
 var spacing = Math.floor(size/count);
 
-var materialSettings = { color: 0xF0F0F0, opacity: 0, linewidth: settings.linewidth, linecap: settings.linecap, linejoin: settings.linejoin };
+var materialSettings = { 
+  color: settings.color, 
+  opacity: settings.opacity, 
+  linewidth: settings.linewidth, 
+  linecap: settings.linecap, 
+  linejoin: settings.linejoin
+};
 var lettermaterial1 = new THREE.LineBasicMaterial( materialSettings );
 var lettermaterial2 = new THREE.LineBasicMaterial( materialSettings );
 
@@ -240,8 +247,8 @@ var cameraLoop = function() {
 
   tweenRotation = { x: group.rotation.x, y: group.rotation.y, z: group.rotation.z, opacity1: 0, opacity2: 0 };
 
-  var top = { x: 1.5708, y: 0, z: 0, opacity1: 1, opacity2: 0 }
-  var right = { x: 0, y: -1.5708, z: 0, opacity1: 0, opacity2: 1 };
+  var top = { x: 1.5708, y: 0, z: 0, opacity1: settings.opacity, opacity2: 0 }
+  var right = { x: 0, y: -1.5708, z: 0, opacity1: 0, opacity2: settings.opacity };
 
   var tween_curve = TWEEN.Easing.Quintic.EaseInOut;
   var tween_time = settings.transitiontime;
@@ -333,7 +340,8 @@ var drawsegment = function(i, x, y, randomZ, _material) {
 
   var randomZ2 = randomZ + (Math.random()>.5 ? -1 : 1);
 
-  var hack = 0.05;
+  // var hack = 0.05;
+  var hack = 0;
 
   switch (i) {
     case 0:
